@@ -6,8 +6,12 @@ using UnityEngine.Serialization;
 
 namespace Main.Utils.Component
 {
-
     
+    /// <summary>
+    /// https://github.com/Hoyeom/Hoyeom_Utils
+    /// </summary>
+
+    [RequireComponent(typeof(SpriteRenderer))]
     public class SpriteStateAnimator : MonoBehaviour
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -16,7 +20,7 @@ namespace Main.Utils.Component
         
         public bool unscaledTime;
         public SpriteAnimatorState[] states;
-        private CancellationTokenSource cts;
+        private CancellationTokenSource _cts;
 
         [Serializable]
         public class SpriteAnimatorState
@@ -30,6 +34,8 @@ namespace Main.Utils.Component
         {
             if (TryGetComponent<SpriteRenderer>(out var component))
                 spriteRenderer = component;
+
+            PlayRoutine();
         }
 
         public SpriteStateAnimator SetState(int index)
@@ -44,6 +50,13 @@ namespace Main.Utils.Component
             return this;
         }
 
+        public SpriteStateAnimator Stop()
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            return this;
+        }
+
         public async UniTaskVoid PlayRoutine(int millisecondsDelay = 200, int stateIndex = 0)
         {
             if(states == null)
@@ -53,26 +66,25 @@ namespace Main.Utils.Component
             
             if(stateLength == 0)
                 return;
-
-
-
+            
             MillisecondsDelay = millisecondsDelay;
             StateIndex = stateIndex;
             
-            cts?.Cancel();
-            cts?.Dispose();
+            _cts?.Cancel();
+            _cts?.Dispose();
             
-            cts = new CancellationTokenSource();
+            _cts = new CancellationTokenSource();
             
-            var token = cts.Token;
+            var token = _cts.Token;
 
-            while (stateLength > StateIndex)
+            while (true)
             {
+                StateIndex = Mathf.Clamp(StateIndex, 0, stateLength - 1);
+                
                 var state = states[StateIndex];
 
                 var prevStateIndex = StateIndex;
                 var hasExitTime = state.hasExitTime;
-                var exit = true;
 
                 var spriteLength = state.sprites.Length;
                 var loop = state.loop;
@@ -97,9 +109,6 @@ namespace Main.Utils.Component
                 int LoopCalculator(int value) => (value + 1) % spriteLength;
                 int Calculator(int value) => Mathf.Clamp(value + 1, 0, spriteLength - 1);
             }
-            
-            cts?.Cancel();
-            cts?.Dispose();
         }
 
 
