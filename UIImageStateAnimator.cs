@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -13,7 +13,7 @@ namespace Main.Utils.Component
     /// </summary>
 
     [RequireComponent(typeof(Image))]
-    public class UIStateStateAnimator : MonoBehaviour
+    public class UIImageStateAnimator : MonoBehaviour
     {
         [SerializeField] private Image image;
         [field:SerializeField] private int StateIndex { get; set; }
@@ -39,19 +39,19 @@ namespace Main.Utils.Component
             PlayRoutine();
         }
 
-        public UIStateStateAnimator SetState(int index)
+        public UIImageStateAnimator SetState(int index)
         {
             StateIndex = index;
             return this;
         }
 
-        public UIStateStateAnimator SetSpeed(int millisecondsDelay)
+        public UIImageStateAnimator SetSpeed(int millisecondsDelay)
         {
             MillisecondsDelay = millisecondsDelay;
             return this;
         }
 
-        public UIStateStateAnimator Stop()
+        public UIImageStateAnimator Stop()
         {
             _cts?.Cancel();
             _cts?.Dispose();
